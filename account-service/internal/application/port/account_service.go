@@ -1,10 +1,10 @@
 package port
 
 import (
-	"account-service/internal/application/dto/command"
+	"account-service/internal/application/dto"
 	"account-service/internal/domain/entity"
 )
 
 type AccountService interface {
-	CreateAccount(command command.CreateAccountCommand) entity.Account
+	CreateAccount(command dto.CreateAccountCommand) entity.Account
 }

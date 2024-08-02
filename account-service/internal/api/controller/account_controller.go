@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"account-service/internal/application/dto/command"
+	"account-service/internal/application/dto"
 	"account-service/internal/application/port"
+	"account-service/internal/application/service"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,10 +14,16 @@ type AccountController struct {
 	AccountService port.AccountService
 }
 
+func NewAccountController() *AccountController {
+	return &AccountController{
+		AccountService: service.NewAccountServiceImpl(),
+	}
+}
+
 func (a *AccountController) RegisterAccount(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	account := a.AccountService.CreateAccount(command.CreateAccountCommand{})
+	account := a.AccountService.CreateAccount(dto.CreateAccountCommand{})
 
 	err := json.NewEncoder(w).Encode(account)
 	if err != nil {

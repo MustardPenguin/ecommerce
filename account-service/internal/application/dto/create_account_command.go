@@ -1,4 +1,4 @@
-package command
+package dto
 
 type CreateAccountCommand struct {
 	Email    string
