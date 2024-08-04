@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func InitConnection() {
+func InitConnection() *sql.DB {
 	// Connect to database
 	dbHost := os.Getenv("DATABASE_HOST")
 	dbUser := os.Getenv("POSTGRES_USER")
@@ -23,14 +23,8 @@ func InitConnection() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalf("Error closing db")
-		}
-	}(db)
-
 	runScript(db, "./script/init-local-database.sql")
+	return db
 }
 
 func runScript(db *sql.DB, path string) {

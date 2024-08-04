@@ -2,6 +2,7 @@ package api
 
 import (
 	"account-service/internal/api/controller"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,8 +10,8 @@ import (
 
 type Server struct{}
 
-func StartServer(port string) {
-	setupController()
+func StartServer(db *sql.DB, port string) {
+	setupController(db)
 
 	addr := fmt.Sprintf(":%s", port)
 	err := http.ListenAndServe(addr, nil)
@@ -20,14 +21,9 @@ func StartServer(port string) {
 	}
 }
 
-func setupController() {
+func setupController(db *sql.DB) {
 
-	//accountServiceImpl := service.NewAccountServiceImpl()
-	//
-	//accountController := controller.AccountController{
-	//	AccountService: accountServiceImpl,
-	//}
-	accountController := controller.NewAccountController()
+	accountController := controller.NewAccountController(db)
 
 	http.HandleFunc("POST /api/account", accountController.RegisterAccount)
 }

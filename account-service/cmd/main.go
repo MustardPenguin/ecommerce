@@ -3,6 +3,7 @@ package main
 import (
 	"account-service/cmd/util"
 	"account-service/internal/api"
+	"database/sql"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -17,9 +18,16 @@ func main() {
 	}
 
 	// Initiate database connection
-	util.InitConnection()
+	db := util.InitConnection()
 
 	// Start http server
 	port := os.Getenv("PORT")
-	api.StartServer(port)
+	api.StartServer(db, port)
+
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatalf("Error closing db")
+		}
+	}(db)
 }

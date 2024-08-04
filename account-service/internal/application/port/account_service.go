@@ -6,5 +6,5 @@ import (
 )
 
 type AccountService interface {
-	CreateAccount(command dto.CreateAccountCommand) entity.Account
+	CreateAccount(command dto.CreateAccountCommand) (entity.Account, error)
 }

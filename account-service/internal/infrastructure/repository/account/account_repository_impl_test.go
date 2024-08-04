@@ -89,7 +89,7 @@ func TestMain(m *testing.M) {
 }
 
 // UTIL
-func saveAccount(t testing.TB, account *entity.Account) *entity.Account {
+func saveAccount(t testing.TB, account entity.Account) entity.Account {
 	t.Helper()
 	savedAccount, err := accountRepos.SaveAccount(account)
 
@@ -103,13 +103,14 @@ func saveAccount(t testing.TB, account *entity.Account) *entity.Account {
 // TESTS
 func TestSaveAccount(t *testing.T) {
 	account := entity.Account{
-		Email:    "test@test",
-		Password: "password",
+		AccountId: 1,
+		Email:     "test@test",
+		Password:  "password",
 	}
-	savedAccount := saveAccount(t, &account)
+	savedAccount := saveAccount(t, account)
 
-	if *savedAccount != account {
-		t.Fatalf("expected %v got %v", savedAccount, account)
+	if savedAccount != account {
+		t.Fatalf("expected %v got %v", account, savedAccount)
 	}
 }
 
@@ -119,7 +120,7 @@ func TestGetAccountByEmail(t *testing.T) {
 		Password: "this",
 	}
 
-	savedAccount := saveAccount(t, &account)
+	savedAccount := saveAccount(t, account)
 
 	got, err := accountRepos.GetAccountByEmail("this@mail")
 
@@ -127,14 +128,14 @@ func TestGetAccountByEmail(t *testing.T) {
 		t.Errorf("error while getting email: %v", err)
 	}
 
-	if *savedAccount != *got {
+	if savedAccount != got {
 		t.Errorf("got %v want %v", got, account)
 	}
 }
 
 func TestGetAccountById(t *testing.T) {
 	got, err := accountRepos.GetAccountById("1")
-	log.Print(got)
+
 	if err != nil {
 		t.Errorf("error while getting account by id: %v", err)
 	}

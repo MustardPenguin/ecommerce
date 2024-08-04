@@ -3,25 +3,27 @@ package service
 import (
 	"account-service/internal/application/command"
 	"account-service/internal/application/dto"
-	"account-service/internal/domain"
 	"account-service/internal/domain/entity"
-	"fmt"
+	"database/sql"
 )
 
 type AccountServiceImpl struct {
-	AccountDomainService  domain.AccountDomainService
-	AccountCommandHandler command.AccountCommandHandler
+	AccountCommandHandler *command.AccountCommandHandler
 }
 
-func NewAccountServiceImpl() *AccountServiceImpl {
+func NewAccountServiceImpl(db *sql.DB) *AccountServiceImpl {
 	return &AccountServiceImpl{
-		AccountDomainService:  domain.AccountDomainService{},
-		AccountCommandHandler: command.AccountCommandHandler{},
+		AccountCommandHandler: command.NewAccountCommandHandler(db),
 	}
 }
 
-func (a *AccountServiceImpl) CreateAccount(command dto.CreateAccountCommand) entity.Account {
-	fmt.Printf("called account service impl")
+func (a *AccountServiceImpl) CreateAccount(command dto.CreateAccountCommand) (entity.Account, error) {
 
-	return a.AccountCommandHandler.CreateAccount(command)
+	account, err := a.AccountCommandHandler.CreateAccount(command)
+
+	if err != nil {
+		return account, err
+	}
+
+	return account, nil
 }
