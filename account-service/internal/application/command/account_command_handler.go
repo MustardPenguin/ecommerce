@@ -7,6 +7,8 @@ import (
 	"account-service/internal/domain/entity"
 	"account-service/internal/infrastructure/repository/account"
 	"database/sql"
+	"errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AccountCommandHandler struct {
@@ -30,12 +32,26 @@ func (a *AccountCommandHandler) CreateAccount(command dto.CreateAccountCommand) 
 		return entity.Account{}, err
 	}
 
+	found, _ := a.AccountRepository.GetAccountByEmail(command.Email)
+
+	if found != (entity.Account{}) {
+		return entity.Account{}, errors.New("email already taken")
+	}
+
+	pw, err := bcrypt.GenerateFromPassword([]byte(account.Password), 10)
+
+	if err != nil {
+		return entity.Account{}, err
+	}
+
+	account.Password = string(pw[:])
 	account, err = a.AccountRepository.SaveAccount(account)
 
 	if err != nil {
 		return entity.Account{}, err
 	}
 
+	account.Password = ""
 	return account, nil
 }
 
