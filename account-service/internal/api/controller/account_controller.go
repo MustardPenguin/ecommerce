@@ -42,6 +42,25 @@ func (a *AccountController) RegisterAccount(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+func (a *AccountController) Authenticate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	req := getBody(w, r, dto.AuthenticationRequest{})
+	res, err := a.AccountService.Authenticate(req)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		errStr := fmt.Sprintf("Error encoding json: %v", err)
+		log.Print(errStr)
+		http.Error(w, errStr, http.StatusInternalServerError)
+	}
+}
+
 func getBody[T any](w http.ResponseWriter, r *http.Request, data T) T {
 
 	body, err := io.ReadAll(r.Body)

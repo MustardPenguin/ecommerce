@@ -3,6 +3,7 @@ package command
 import (
 	"account-service/internal/application/dto"
 	"account-service/internal/application/port"
+	"account-service/internal/application/query"
 	"account-service/internal/domain"
 	"account-service/internal/domain/entity"
 	"account-service/internal/infrastructure/repository/account"
@@ -13,12 +14,14 @@ import (
 
 type AccountCommandHandler struct {
 	AccountDomainService *domain.AccountDomainService
+	AccountQueryHandler  *query.AccountQueryHandler
 	AccountRepository    port.AccountRepository
 }
 
 func NewAccountCommandHandler(db *sql.DB) *AccountCommandHandler {
 	return &AccountCommandHandler{
 		AccountDomainService: &domain.AccountDomainService{},
+		AccountQueryHandler:  query.NewAccountQueryHandler(db),
 		AccountRepository:    account.NewAccountRepositoryImpl(db),
 	}
 }
@@ -32,7 +35,7 @@ func (a *AccountCommandHandler) CreateAccount(command dto.CreateAccountCommand) 
 		return entity.Account{}, err
 	}
 
-	found, _ := a.AccountRepository.GetAccountByEmail(command.Email)
+	found, _ := a.AccountQueryHandler.GetAccountByEmail(command.Email)
 
 	if found != (entity.Account{}) {
 		return entity.Account{}, errors.New("email already taken")

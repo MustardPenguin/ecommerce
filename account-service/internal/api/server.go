@@ -26,4 +26,5 @@ func setupController(db *sql.DB) {
 	accountController := controller.NewAccountController(db)
 
 	http.HandleFunc("POST /api/account", accountController.RegisterAccount)
+	http.HandleFunc("POST /api/authenticate", accountController.Authenticate)
 }
