@@ -26,7 +26,7 @@ func (a *AccountController) RegisterAccount(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 
 	command := helper.GetBody(w, r, dto.CreateAccountCommand{})
-	log.Print(command)
+
 	account, err := a.AccountService.CreateAccount(command)
 
 	if err != nil {
