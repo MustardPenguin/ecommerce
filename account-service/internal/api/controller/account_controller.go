@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"account-service/internal/api/helper"
 	"account-service/internal/application/dto"
 	"account-service/internal/application/port"
 	"account-service/internal/application/service"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 )
@@ -25,7 +25,8 @@ func NewAccountController(db *sql.DB) *AccountController {
 func (a *AccountController) RegisterAccount(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	command := getBody(w, r, dto.CreateAccountCommand{})
+	command := helper.GetBody(w, r, dto.CreateAccountCommand{})
+	log.Print(command)
 	account, err := a.AccountService.CreateAccount(command)
 
 	if err != nil {
@@ -45,7 +46,7 @@ func (a *AccountController) RegisterAccount(w http.ResponseWriter, r *http.Reque
 func (a *AccountController) Authenticate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	req := getBody(w, r, dto.AuthenticationRequest{})
+	req := helper.GetBody(w, r, dto.AuthenticationRequest{})
 	res, err := a.AccountService.Authenticate(req)
 
 	if err != nil {
@@ -59,28 +60,4 @@ func (a *AccountController) Authenticate(w http.ResponseWriter, r *http.Request)
 		log.Print(errStr)
 		http.Error(w, errStr, http.StatusInternalServerError)
 	}
-}
-
-func getBody[T any](w http.ResponseWriter, r *http.Request, data T) T {
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Unable to read request body", http.StatusInternalServerError)
-		return data
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			http.Error(w, "Error closing request body", http.StatusInternalServerError)
-			return
-		}
-	}(r.Body)
-
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		http.Error(w, "Error parsing JSON", http.StatusBadRequest)
-		return data
-	}
-
-	return data
 }
